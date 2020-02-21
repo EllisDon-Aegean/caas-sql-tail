@@ -1,0 +1,48 @@
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  jpa:
+    hibernate:
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+okta:
+  oauth2:
+    issuer: https://ellisdon.oktapreview.com/oauth2/default
+    audience: http://api
+    scope-claim: scope
+
+database:
+  sql:
+    host: ${mysqlhost}
+    port: 3306
+    username: ${mysqlUsername}
+    password: ${mysqlPassword}
+    schema: ${mysqlSchema}
+
+rabbitmq:
+  queue:
+    account: account_oplog_queue
+    contact: contact_oplog_queue
+    contactrole: contactrole_oplog_queue
+    company: company_oplog_queue
+    company_group: company_group_oplog_queue
+    sdi: sdi_oplog_queue
+
+management:
+  security:
+    enabled: false
+
+logging:
+  level:
+    org.springframework: error
+    com.ellisdon.caas: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor: trace
+
+server:
+  port: 9095

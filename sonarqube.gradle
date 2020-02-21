@@ -1,0 +1,12 @@
+sonarqube {
+  properties {
+    property 'sonar.tests', 'src/test/ , src/integTest'
+    property 'sonar.sources', 'src/main/'
+    property 'sonar.exclusions' , [ '**/domain/**', '**/mappers/**', '**/app/**', '**/model/**', '**/project/**' ]
+    property 'sonar.junit.reportPaths', 'build/integration-test-results/ , build/test-results/test'
+    property 'sonar.host.url', 'https://az-sonar.ellisdon.com'
+    property 'sonar.login', 'f0e0fe18041c87c225c7249212ffe90f298d1e9e'
+    property 'sonar.projectKey', 'CompContactGCP'
+    property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
+  }
+}

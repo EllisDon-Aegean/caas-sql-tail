@@ -1,0 +1,89 @@
+# Default values for workflowservice.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+fullnameOverride: workflowservice
+replicaCount: 1
+image:
+  repository: VALUE_TO_BE_OVERRIDDEN
+  tag: latest
+
+ 
+imagePullSecrets: []
+  # Optionally specify an array of imagePullSecrets.
+  # Secrets must be manually created in the namespace.
+  # ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
+  #
+  # This uses credentials from secret "myRegistryKeySecretName".
+  # - name: myRegistryKeySecretName
+service:
+  port: 80  
+  targetPort: 8080 
+
+memory: 
+  limit: VALUE_TO_BE_OVERRIDDEN  
+
+ingress:
+  enabled: false
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT, GET, POST, PATCH, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "JSESSIONID"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "180"
+  path: /workflow
+  hostname: VALUE_TO_BE_OVERRIDDEN
+  secretName: VALUE_TO_BE_OVERRIDDEN
+
+secrets: {}
+  # Optionally specify a set of secret objects whose values
+  # will be injected as environment variables by default.
+  # You should add this section to a file like secrets.yaml
+  # that is explicitly NOT committed to source code control
+  # and then include it as part of your helm install step.
+  # ref: https://kubernetes.io/docs/concepts/configuration/secret/
+  #
+  # This creates a secret "mysecret" and injects "mypassword"
+  # as the environment variable MYSECRET_MYPASSWORD=123.
+  # mysecret:
+  #   mypassword: 123
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+applicationInsights:
+  InstrumentationKey: VALUE_TO_BE_OVERRIDDEN
+
+protocol: https
+environment: VALUE_TO_BE_OVERRIDDEN
+
+#OKTA Info
+okta:
+  oauth2:
+    issuer: VALUE_TO_BE_OVERRIDDEN
+    audience: VALUE_TO_BE_OVERRIDDEN
+
+#mySQL info
+mysql:
+  host: VALUE_TO_BE_OVERRIDDEN
+  database: VALUE_TO_BE_OVERRIDDEN
+  user: VALUE_TO_BE_OVERRIDDEN
+  pwd: VALUE_TO_BE_OVERRIDDEN
+  schema: VALUE_TO_BE_OVERRIDDEN
+

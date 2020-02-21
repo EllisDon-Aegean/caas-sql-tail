@@ -1,0 +1,44 @@
+apply plugin: 'jacoco'
+jacocoTestCoverageVerification {
+  violationRules {
+    rule {
+      element = 'CLASS'
+        limit {
+          counter = 'LINE'
+          value = 'COVEREDRATIO'
+          minimum = 0.0
+      }
+      excludes = [
+        'com.ellisdon.caas.app.*',
+        'com.ellisdon.caas.app.config.*',
+        'com.ellisdon.caas.domain.*',
+        'com.ellisdon.caas.model.*',
+        'com.ellisdon.caas.project.controller.*',
+        'com.ellisdon.caas.project.services.*',
+        'com.ellisdon.caas.mappers.*'
+        
+        
+      ]
+    }
+  }
+}
+
+jacocoTestReport {
+  reports {
+        xml.enabled true
+  }
+  
+  afterEvaluate {
+    classDirectories = files(classDirectories.files.collect {
+      fileTree(dir: it, exclude: [
+       	'com/ellisdon/caas/app/**',
+        'com/ellisdon/caas/app/config/**',
+        'com/ellisdon/caas/domain/**',
+        'com/ellisdon/caas/model/**',
+        'com/ellisdon/caas/project/controller/**',
+        'com/ellisdon/caas/project/services/**',
+        'com/ellisdon/caas/mappers/**'
+      ])
+    })
+  }
+}

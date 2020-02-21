@@ -1,0 +1,97 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "sqltailservice.fullname" . }}
+  labels:
+    app: {{ template "sqltailservice.name" . }}
+    chart: {{ template "sqltailservice.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "sqltailservice.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "sqltailservice.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /workflow/actuator/health
+              port: {{ .Values.service.targetPort }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+              httpGet:
+                path: /workflow/actuator/health
+                port: {{ .Values.service.targetPort }}
+              initialDelaySeconds: 30
+              periodSeconds: 10
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.environment }}
+            - name: oauth2Issuer
+              value: {{ .Values.okta.oauth2.issuer }}
+            - name: oauth2Audience
+              value: {{ .Values.okta.oauth2.audience }}
+            - name: mysqlhost
+              value: {{ .Values.mysql.host }}
+            - name: mysqlUsername
+              value: {{ .Values.mysql.user }}
+            - name: mysqlPassword
+              value: {{ .Values.mysql.pwd }}
+            - name: mysqlSchema
+              value: {{ .Values.mysql.schema }}
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_LOGS_INJECTION
+              value: 'true'
+            - name: DD_SERVICE_NAME
+              value: {{ template "sqltailservice.fullname" . }}
+            - name: DD_TRACE_ANALYTICS_ENABLED
+              value: 'true'
+            - name: JAVA_OPTS
+              value: "-javaagent:/datadog-agent.jar"
+            {{- $root := . }}
+            {{- range $ref, $values := .Values.secrets }}
+            {{- range $key, $value := $values }}
+            - name: {{ $ref | upper }}_{{ $key | upper }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "sqltailservice.fullname" $root }}-{{ $ref }}
+                  key: {{ $key }}
+            {{- end }}
+            {{- end }}
+          resources:
+            limits:
+              memory: {{ .Values.memory.limit }}
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
