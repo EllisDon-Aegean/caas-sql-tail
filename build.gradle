@@ -74,6 +74,7 @@ dependencies {
 	generatedCompile('joda-time:joda-time:2.9.9')
 	generatedCompile('org.mapstruct:mapstruct-jdk8:1.2.0.Final')
 	generatedCompile('org.apache.commons:commons-lang3:3.8.1')
+	generatedCompile('org.springframework.boot:spring-boot-starter-amqp:2.2.1.RELEASE')
 	compile('joda-time:joda-time:2.9.9')
 	compile('org.springframework.boot:spring-boot-starter')
 	compile('org.springframework.boot:spring-boot-starter-web')
@@ -84,6 +85,7 @@ dependencies {
 	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
 	compile('org.springframework.cloud:spring-cloud-starter-openfeign')
 	compile('io.github.openfeign:feign-httpclient:9.5.0')
+	compile('org.springframework.boot:spring-boot-starter-amqp:2.2.1.RELEASE')
 
 	compile('io.springfox:springfox-swagger2:2.7.0')
 	compile('io.springfox:springfox-swagger-ui:2.7.0')
