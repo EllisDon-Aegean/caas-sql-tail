@@ -15,6 +15,12 @@ spring:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
+okta:
+  oauth2:
+    issuer: ${oauth2Issuer}
+    audience: ${oauth2Audience}
+    scope-claim: scope
+
 management:
   security:
     enabled: false
