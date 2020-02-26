@@ -42,10 +42,6 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.environment }}
-            - name: oauth2Issuer
-              value: {{ .Values.okta.oauth2.issuer }}
-            - name: oauth2Audience
-              value: {{ .Values.okta.oauth2.audience }}
             - name: mysqlhost
               value: {{ .Values.mysql.host }}
             - name: mysqlUsername
@@ -55,6 +51,18 @@ spec:
             - name: mysqlSchema
               value: {{ .Values.mysql.schema }}
             - name: DD_AGENT_HOST
+            - name: mongoHost
+              value: {{.Values.mongo.host}}
+            - name: mongoUsername
+              value: {{.Values.mongo.user}}
+            - name: mongoPassword
+              value: {{.Values.mongo.pwd}}
+            - name: rabbitMqHost
+              value: {{.Values.rabbitmq.host}}
+            - name: rabbitMqUsername
+              value: {{.Values.rabbitmq.user}}
+            - name: rabbitMqPassword
+              value: {{.Values.rabbitmq.pwd}}
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP

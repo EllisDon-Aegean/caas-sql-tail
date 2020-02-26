@@ -27,6 +27,9 @@ public class SqlTailEventListener implements BinaryLogClient.EventListener {
     @Autowired
     Gson gson;
 
+    @Autowired
+    MessageProducer messageProducer;
+
     void setTableInfo(Map<String, Map<String, String>> tableInfo) {
         this.tableInfo = tableInfo;
     }
@@ -50,7 +53,9 @@ public class SqlTailEventListener implements BinaryLogClient.EventListener {
                 for (Serializable[] row : writeRowsEventData.getRows()) {
                     String tableName = tableNameMap.get(writeRowsEventData.getTableId());
                     log.info("Inserting into {} with {}", tableName, handleSerializableRow(row).toString());
-                    assembleMessage(row, tableName);
+                    if (tableInfo.get(tableName) != null) {
+                        messageProducer.sendMessage(tableName, assembleMessage(row, tableName));
+                    }
                 }
                 break;
             case PRE_GA_UPDATE_ROWS:
@@ -61,7 +66,9 @@ public class SqlTailEventListener implements BinaryLogClient.EventListener {
                 for (Map.Entry<Serializable[], Serializable[]> row : updateRowsEventData.getRows()) {
                     String tableName = tableNameMap.get(updateRowsEventData.getTableId());
                     log.info("Updating {} with {}", tableNameMap.get(updateRowsEventData.getTableId()), handleSerializableRow(row.getValue()).toString());
-                    assembleMessage(row.getValue(), tableName);
+                    if (tableInfo.get(tableName) != null) {
+                        messageProducer.sendMessage(tableName, assembleMessage(row.getValue(), tableName));
+                    }
                 }
                 break;
             case PRE_GA_DELETE_ROWS:
@@ -72,33 +79,33 @@ public class SqlTailEventListener implements BinaryLogClient.EventListener {
                 for (Serializable[] row : deleteRowsEventData.getRows()) {
                     String tableName = tableNameMap.get(deleteRowsEventData.getTableId());
                     log.info("Deleting from {} with {}", tableNameMap.get(deleteRowsEventData.getTableId()), handleSerializableRow(row).toString());
-                    assembleMessage(row, tableName);
+                    if (tableInfo.get(tableName) != null) {
+                        messageProducer.sendMessage(tableName, assembleMessage(row, tableName));
+                    }
                 }
                 break;
         }
     }
 
-    private void assembleMessage(Serializable[] row, String tableName) {
-        Map<String, RowValueDetails> message = new HashMap<>();
-        if( tableInfo.get(tableName) != null) {
-            Map<String, String> tableColumnInfo = tableInfo.get(tableName);
-            for (int i = 0; i < tableColumnInfo.keySet().size(); i++) {
-                String column = (String) tableColumnInfo.keySet().toArray()[i];
-                message.put(column, new RowValueDetails(tableColumnInfo.get(column), serializableToString(row[i])));
-            }
-
-            // currently only logging message.
-            // TODO handle message based on rabbitMQ configuration
-            log.info(gson.toJson(message));
+    private String assembleMessage(Serializable[] row, String tableName) {
+        Map<String, RowValueDetails> messageAsMap = new HashMap<>();
+        Map<String, String> tableColumnInfo = tableInfo.get(tableName);
+        for (int i = 0; i < tableColumnInfo.keySet().size(); i++) {
+            String column = (String) tableColumnInfo.keySet().toArray()[i];
+            messageAsMap.put(column, new RowValueDetails(tableColumnInfo.get(column), serializableToString(row[i])));
         }
+
+        log.debug(gson.toJson(messageAsMap));
+        return gson.toJson(messageAsMap);
+
     }
 
     private List<String> handleSerializableRow(Serializable[] row) {
         return Arrays.stream(row).map(c -> {
-                    String value;
+                    String value = null;
                     if (c instanceof byte[]) {
                         value = new String((byte[]) c, StandardCharsets.UTF_8);
-                    } else {
+                    } else if (c != null) {
                         value = String.valueOf(c);
                     }
                     return value;
@@ -106,11 +113,12 @@ public class SqlTailEventListener implements BinaryLogClient.EventListener {
         ).collect(Collectors.toList());
     }
 
-    private String serializableToString( Serializable serializable) {
+    private String serializableToString(Serializable serializable) {
         if (serializable instanceof byte[]) {
             return new String((byte[]) serializable, StandardCharsets.UTF_8);
-        } else {
+        } else if (serializable != null) {
             return String.valueOf(serializable);
         }
+        return null;
     }
- }
+}

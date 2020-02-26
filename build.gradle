@@ -2,7 +2,7 @@
 buildscript {
 
 	ext {
-		springBootVersion = '2.0.5.RELEASE'
+		springBootVersion = '2.2.1.RELEASE'
 	}
 	
 	repositories {
@@ -54,7 +54,7 @@ repositories {
 	mavenCentral()
 }
 
-ext['springCloudVersion'] = 'Finchley.RELEASE'
+//ext['springCloudVersion'] = 'Greenwich.RELEASE'
 
 dependencies {
 
@@ -65,60 +65,51 @@ dependencies {
 	compile('com.google.code.gson:gson:2.8.6')
 
 
-	//database
+	// rabbit mq
+	compile('org.springframework.boot:spring-boot-starter-amqp')
+	compile('org.springframework.amqp:spring-rabbit')
+
+	// sql
 	compile('org.springframework.boot:spring-boot-starter-jdbc')
 	compile('mysql:mysql-connector-java')
 	compile('p6spy:p6spy:3.8.2') //logging queries for debug purpose until stable
 
+	// mongo
+	compile "org.springframework.boot:spring-boot-starter-data-mongodb"
+
 
 	// TODO CLEAN UP DEPENDENCIES
+	//spring
 	generatedCompile('org.springframework.boot:spring-boot-starter')
 	generatedCompile('org.springframework.boot:spring-boot-starter-web')
 	generatedCompile('org.springframework.boot:spring-boot-starter-security')
 	generatedCompile('org.springframework.boot:spring-boot-starter-actuator')
-	generatedCompile('io.springfox:springfox-swagger2:2.7.0')
-	generatedCompile('io.springfox:springfox-swagger-ui:2.7.0')
-	generatedCompile('joda-time:joda-time:2.9.9')
-	generatedCompile('org.mapstruct:mapstruct-jdk8:1.2.0.Final')
-	generatedCompile('org.apache.commons:commons-lang3:3.8.1')
-	compile('joda-time:joda-time:2.9.9')
 	compile('org.springframework.boot:spring-boot-starter')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-hateoas')
 	compile('org.springframework.boot:spring-boot-starter-security')
-	compile('org.springframework.cloud:spring-cloud-stream')
-	compile('org.springframework.cloud:spring-cloud-starter-netflix-hystrix')
-	compile('org.springframework.cloud:spring-cloud-starter-openfeign')
-	compile('io.github.openfeign:feign-httpclient:9.5.0')
 
-	compile('io.springfox:springfox-swagger2:2.7.0')
-	compile('io.springfox:springfox-swagger-ui:2.7.0')
+	// misc
+	compile('io.github.openfeign:feign-httpclient:9.5.0')
+	generatedCompile('org.mapstruct:mapstruct-jdk8:1.2.0.Final')
+	generatedCompile('org.apache.commons:commons-lang3:3.8.1')
+	compile('joda-time:joda-time:2.9.9')
 	compile('org.apache.commons:commons-lang3:3.8.1')
 	compile('org.apache.commons:commons-collections4:4.0')
 	compile('com.fasterxml.jackson.datatype:jackson-datatype-joda:2.9.6')
-
 	compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.8'
-
-	compile 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.1.RELEASE'
-	compile('com.okta.spring:okta-spring-boot-starter:0.6.0')
-
-//	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('com.google.code.gson:gson:2.8.6')
-
-	compile('com.google.cloud:google-cloud-storage:1.102.0')
-
 
 	compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 
 }
 
 
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
-}
+//dependencyManagement {
+//	imports {
+//		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+//	}
+//}
 
 sourceSets.main.java.srcDirs = ['src/main/java',
 								'build/generated/sources/api/server/src/main/java',
