@@ -1,8 +1,8 @@
 package com.ellisdon.caas.sqltail.services;
 
 import com.ellisdon.caas.sqltail.clients.RabbitMqClient;
-import com.ellisdon.caas.sqltail.domain.ExchangeConfiguration;
-import com.ellisdon.caas.sqltail.repositories.ExchangeConfigurationRepository;
+import com.ellisdon.caas.sqltail.domain.Feature;
+import com.ellisdon.caas.sqltail.repositories.FeatureRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -33,7 +33,7 @@ public class RabbitMqConfigurationManager {
     ExchangeConfigurationProvider exchangeConfigurationProvider;
 
     @Autowired
-    ExchangeConfigurationRepository exchangeConfigurationRepository;
+    FeatureRepository featureRepository;
 
     @Scheduled(initialDelay = 0, fixedRate = FIVE_SECONDS)
     public void refreshExchangeBindingConfiguration() {
@@ -44,10 +44,10 @@ public class RabbitMqConfigurationManager {
     void getLatestExchangeConfig() {
         Map<String, List<String>> exchangeConfigurationMap = new HashMap<>();
 
-        Iterable<ExchangeConfiguration> latestConfigurations = exchangeConfigurationRepository.findAll();
-        for (ExchangeConfiguration configuration : latestConfigurations) {
-            String exchangeName = configuration.getFeature();
-            List<String> tableNames = configuration.getTableNames();
+        Iterable<Feature> features = featureRepository.findAll();
+        for (Feature feature : features) {
+            String exchangeName = feature.getFeature();
+            List<String> tableNames = feature.getTableNames();
             tableNames.forEach(tableName -> {
                 String queueName = exchangeName + UNDERSCORE + tableName;
                 rabbitMqClient.bindToKey(exchangeName, tableName, queueName);

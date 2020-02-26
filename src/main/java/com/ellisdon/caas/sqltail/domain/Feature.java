@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Document(collection = "features")
-public class ExchangeConfiguration {
+public class Feature {
 
     @Id
     @Field("_id")
