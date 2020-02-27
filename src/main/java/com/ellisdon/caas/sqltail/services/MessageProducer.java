@@ -1,6 +1,7 @@
 package com.ellisdon.caas.sqltail.services;
 
 import com.ellisdon.caas.sqltail.clients.RabbitMqClient;
+import com.ellisdon.caas.sqltail.components.ExchangeConfigurationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;

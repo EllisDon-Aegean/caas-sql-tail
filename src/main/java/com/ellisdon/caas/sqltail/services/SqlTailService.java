@@ -2,6 +2,7 @@ package com.ellisdon.caas.sqltail.services;
 
 import com.ellisdon.caas.sqltail.clients.BinLogClientFactory;
 import com.ellisdon.caas.sqltail.clients.SqlClient;
+import com.ellisdon.caas.sqltail.components.SqlTailEventListener;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

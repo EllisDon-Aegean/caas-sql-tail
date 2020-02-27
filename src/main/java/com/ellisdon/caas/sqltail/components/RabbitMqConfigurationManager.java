@@ -1,4 +1,4 @@
-package com.ellisdon.caas.sqltail.services;
+package com.ellisdon.caas.sqltail.components;
 
 import com.ellisdon.caas.sqltail.clients.RabbitMqClient;
 import com.ellisdon.caas.sqltail.domain.Feature;
@@ -26,6 +26,8 @@ public class RabbitMqConfigurationManager {
 
     public static final String UNDERSCORE = "_";
 
+    public static final String QUEUE = "queue";
+
     @Autowired
     RabbitMqClient rabbitMqClient;
 
@@ -49,7 +51,7 @@ public class RabbitMqConfigurationManager {
             String exchangeName = feature.getFeature();
             List<String> tableNames = feature.getTableNames();
             tableNames.forEach(tableName -> {
-                String queueName = exchangeName + UNDERSCORE + tableName;
+                String queueName = exchangeName + UNDERSCORE + tableName + UNDERSCORE + QUEUE;
                 rabbitMqClient.bindToKey(exchangeName, tableName, queueName);
             });
 

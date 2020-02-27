@@ -1,4 +1,4 @@
-package com.ellisdon.caas.sqltail.services;
+package com.ellisdon.caas.sqltail.components;
 
 import org.springframework.stereotype.Component;
 

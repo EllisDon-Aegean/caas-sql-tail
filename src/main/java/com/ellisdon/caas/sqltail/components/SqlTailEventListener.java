@@ -1,6 +1,7 @@
-package com.ellisdon.caas.sqltail.services;
+package com.ellisdon.caas.sqltail.components;
 
 import com.ellisdon.caas.sqltail.domain.RowValueDetails;
+import com.ellisdon.caas.sqltail.services.MessageProducer;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.*;
 import com.google.gson.Gson;
@@ -30,7 +31,7 @@ public class SqlTailEventListener implements BinaryLogClient.EventListener {
     @Autowired
     MessageProducer messageProducer;
 
-    void setTableInfo(Map<String, Map<String, String>> tableInfo) {
+    public void setTableInfo(Map<String, Map<String, String>> tableInfo) {
         this.tableInfo = tableInfo;
     }
 
