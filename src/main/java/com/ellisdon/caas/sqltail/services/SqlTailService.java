@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 @Service
 @Slf4j
@@ -35,7 +36,7 @@ public class SqlTailService {
     SqlClient sqlClient;
 
     @EventListener(ApplicationReadyEvent.class)
-    public void startSqlTail() throws IOException {
+    public void startSqlTail() throws IOException, TimeoutException {
         try {
             List<Map<String, Object>> schemaInfo = sqlClient.queryDbInformation();
             Map<String, Map<String, String>> tableInfo = constructTableInfo(schemaInfo);  // Map<TableName<Map<ColumnName, ColumnDataType>>
@@ -43,9 +44,11 @@ public class SqlTailService {
 
             BinaryLogClient binaryLogClient = binLogClientFactory.getBinaryLogClient();
             binaryLogClient.registerEventListener(eventListener);
-            binaryLogClient.connect();
+            binaryLogClient.connect(5000);
 
-        } catch (IOException e) {
+            log.info("Connection status: {}", binaryLogClient.isConnected());
+
+        } catch (IOException | TimeoutException e) {
             log.error("Failed to connect to SQL DB!", e);
             throw e;
         }

@@ -2,7 +2,9 @@ package com.ellisdon.caas.sqltail.components;
 
 import com.ellisdon.caas.sqltail.clients.RabbitMqClient;
 import com.ellisdon.caas.sqltail.domain.Feature;
+import com.ellisdon.caas.sqltail.domain.Service;
 import com.ellisdon.caas.sqltail.repositories.FeatureRepository;
+import com.ellisdon.caas.sqltail.repositories.ServiceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -10,9 +12,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Responsible for auto binding exchanges and queues based on new configurations
@@ -37,6 +37,10 @@ public class RabbitMqConfigurationManager {
     @Autowired
     FeatureRepository featureRepository;
 
+    @Autowired
+    ServiceRepository serviceRepository;
+
+
     @Scheduled(initialDelay = 0, fixedRate = FIVE_SECONDS)
     public void refreshExchangeBindingConfiguration() {
         getLatestExchangeConfig();
@@ -45,17 +49,26 @@ public class RabbitMqConfigurationManager {
     @Async
     void getLatestExchangeConfig() {
         Map<String, List<String>> exchangeConfigurationMap = new HashMap<>();
+        List<Feature> featureList = new ArrayList<>();
+        featureRepository.findAll().forEach(featureList::add);
 
-        Iterable<Feature> features = featureRepository.findAll();
-        for (Feature feature : features) {
-            String exchangeName = feature.getFeature();
-            List<String> tableNames = feature.getTableNames();
-            tableNames.forEach(tableName -> {
-                String queueName = exchangeName + UNDERSCORE + tableName + UNDERSCORE + QUEUE;
-                rabbitMqClient.bindToKey(exchangeName, tableName, queueName);
+        Iterable<Service> services = serviceRepository.findAll();
+        for (Service service : services) {
+            String serviceName = service.getName();
+            service.getFeatureIds().forEach(serviceFeatureId -> {
+                Optional<Feature> optionalFeature = featureList.stream().filter(feature -> serviceFeatureId.equals(feature.getId())).findFirst();
+                if (optionalFeature.isPresent()) {
+                    Feature feature = optionalFeature.get();
+                    String exchangeName = serviceName + UNDERSCORE + feature.getName();
+                    feature.getTableNames().forEach(tableName -> {
+                        String queueName = exchangeName + UNDERSCORE + tableName + UNDERSCORE + QUEUE;
+                        rabbitMqClient.bindToKey(exchangeName, tableName, queueName);
+                    });
+                    exchangeConfigurationMap.put(exchangeName, feature.getTableNames());
+                } else {
+                    log.error("Unable to find feature with id {} for service {}", serviceFeatureId, serviceName);
+                }
             });
-
-            exchangeConfigurationMap.put(exchangeName, tableNames);
         }
 
         log.info("Refreshed exchange configuration with {}", exchangeConfigurationMap);

@@ -1,7 +1,10 @@
 package com.ellisdon.caas.sqltail.clients;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ public class RabbitMqClient {
     private RabbitAdmin rabbitAdmin;
 
     public void bindToKey(String exchangeName, String routingKey, String queueName) {
+
         DirectExchange exchange = new DirectExchange(exchangeName);
         Queue queue = new Queue(queueName);
         rabbitAdmin.declareExchange(exchange);
@@ -27,9 +31,7 @@ public class RabbitMqClient {
         rabbitAdmin.declareBinding(binding); // re-declare binding if mask changed
     }
 
-
     public void sendMessage(String exchangeName, String routingKey, Object message) {
         rabbitTemplate.convertAndSend(exchangeName, routingKey, message);
     }
-
 }

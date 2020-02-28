@@ -7,6 +7,7 @@ spring:
       database: SqlTailConfiguration
       uri: mongodb://localhost:27017
 
+
   datasource:
     url: jdbc:p6spy:mysql://${mysqlhost}/${mysqlSchema}?nullCatalogMeansCurrent=true&useUnicode=yes&characterEncoding=UTF-8
     username: ${mysqlUsername}
